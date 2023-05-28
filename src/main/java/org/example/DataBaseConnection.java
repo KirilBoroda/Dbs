@@ -52,8 +52,5 @@ public class DataBaseConnection {
         return dataSource;
     }
 
-    public static void main(String[] args) throws SQLException {
-        DataBaseConnection.getConnection();
-    }
 }
 
