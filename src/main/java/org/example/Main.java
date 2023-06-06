@@ -4,13 +4,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
         LessonDao lessonDao = new LessonDao();
         Homework homework = new Homework(1, "Homework 1", "Description 1");
         Lesson lesson = new Lesson(12, "Lesson 123", homework);
-
-        lessonDao.addHomework(homework);
+        HomeworkDao homeworkDao = new HomeworkDao();
+        homeworkDao.addHomework(homework);
         lessonDao.addLesson(lesson);
         System.out.println("Lesson added: " + lesson);
 

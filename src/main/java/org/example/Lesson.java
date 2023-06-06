@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.Objects;
+
 public class Lesson {
     private int id;
     private String name;
@@ -31,6 +33,18 @@ public class Lesson {
         return homework;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Lesson lesson = (Lesson) o;
+        return id == lesson.id && Objects.equals(name, lesson.name) && Objects.equals(homework, lesson.homework);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, homework);
+    }
 
     @Override
     public String toString() {

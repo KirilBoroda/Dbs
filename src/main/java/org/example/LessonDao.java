@@ -5,51 +5,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LessonDao {
-    public void addHomework(Homework homework) throws SQLException {
-        String query = "INSERT INTO Homework (name, description) VALUES (?, ?)";
-
-        try (Connection connection = DataBaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, homework.getName());
-            statement.setString(2, homework.getDescription());
-
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new SQLException("Error adding homework: " + e.getMessage());
-        }
-    }
-
-    public void addLesson(Lesson lesson) throws SQLException {
+    public void addLesson(Lesson lesson) {
         String query = "INSERT INTO Lesson (name, homework_id) VALUES (?, ?)";
+        int nameIndex = 1;
+        int homeworkIdIndex = 2;
 
         try (Connection connection = DataBaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, lesson.getName());
-            statement.setInt(2, lesson.getHomework().getId());
+            statement.setString(nameIndex, lesson.getName());
+
+            if (lesson.getHomework() != null) {
+                statement.setInt(homeworkIdIndex, lesson.getHomework().getId());
+            } else {
+                statement.setNull(homeworkIdIndex, java.sql.Types.INTEGER);
+            }
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new SQLException("Error adding lesson: " + e.getMessage());
+            System.err.println("Error adding lesson: " + e.getMessage());
         }
     }
 
-    public void deleteLesson(int lessonId) throws SQLException {
+
+    public void deleteLesson(int lessonId) {
         String query = "DELETE FROM Lesson WHERE id = ?";
+        int idIndex = 1;
 
         try (Connection connection = DataBaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setInt(1, lessonId);
+            statement.setInt(idIndex, lessonId);
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new SQLException("Error deleting lesson: " + e.getMessage());
+            System.err.println("Error deleting lesson: " + e.getMessage());
         }
     }
 
-    public List<Lesson> getAllLessons() throws SQLException {
+
+    public List<Lesson> getAllLessons() {
         List<Lesson> lessons = new ArrayList<>();
         String query = "SELECT Lesson.id, Lesson.name, Homework.id, Homework.name, Homework.description " +
                 "FROM Lesson " +
@@ -60,11 +55,17 @@ public class LessonDao {
              ResultSet resultSet = statement.executeQuery(query)) {
 
             while (resultSet.next()) {
-                int lessonId = resultSet.getInt(1);
-                String lessonName = resultSet.getString(2);
-                int homeworkId = resultSet.getInt(3);
-                String homeworkName = resultSet.getString(4);
-                String homeworkDescription = resultSet.getString(5);
+                int lessonIdIndex = 1;
+                int lessonNameIndex = 2;
+                int homeworkIdIndex = 3;
+                int homeworkNameIndex = 4;
+                int homeworkDescriptionIndex = 5;
+
+                int lessonId = resultSet.getInt(lessonIdIndex);
+                String lessonName = resultSet.getString(lessonNameIndex);
+                int homeworkId = resultSet.getInt(homeworkIdIndex);
+                String homeworkName = resultSet.getString(homeworkNameIndex);
+                String homeworkDescription = resultSet.getString(homeworkDescriptionIndex);
 
                 Homework homework = new Homework(homeworkId, homeworkName, homeworkDescription);
                 Lesson lesson = new Lesson(lessonId, lessonName, homework);
@@ -72,17 +73,19 @@ public class LessonDao {
                 lessons.add(lesson);
             }
         } catch (SQLException e) {
-            throw new SQLException("Error retrieving lessons: " + e.getMessage());
+            System.err.println("Error retrieving lessons: " + e.getMessage());
         }
 
         return lessons;
     }
 
-    public Lesson getLessonById(int lessonId) throws SQLException {
+
+    public Lesson getLessonById(int lessonId) {
         String query = "SELECT Lesson.id, Lesson.name, Homework.id, Homework.name, Homework.description " +
                 "FROM Lesson " +
                 "JOIN Homework ON Lesson.homework_id = Homework.id " +
                 "WHERE Lesson.id = ?";
+        Lesson lesson = null;
 
         try (Connection connection = DataBaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -91,20 +94,26 @@ public class LessonDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    int lessonIdResult = resultSet.getInt(1);
-                    String lessonName = resultSet.getString(2);
-                    int homeworkId = resultSet.getInt(3);
-                    String homeworkName = resultSet.getString(4);
-                    String homeworkDescription = resultSet.getString(5);
+                    int lessonIdIndex = 1;
+                    int lessonNameIndex = 2;
+                    int homeworkIdIndex = 3;
+                    int homeworkNameIndex = 4;
+                    int homeworkDescriptionIndex = 5;
+
+                    int lessonIdResult = resultSet.getInt(lessonIdIndex);
+                    String lessonName = resultSet.getString(lessonNameIndex);
+                    int homeworkId = resultSet.getInt(homeworkIdIndex);
+                    String homeworkName = resultSet.getString(homeworkNameIndex);
+                    String homeworkDescription = resultSet.getString(homeworkDescriptionIndex);
 
                     Homework homework = new Homework(homeworkId, homeworkName, homeworkDescription);
-                    return new Lesson(lessonIdResult, lessonName, homework);
+                    lesson = new Lesson(lessonIdResult, lessonName, homework);
                 }
             }
         } catch (SQLException e) {
-            throw new SQLException("Error retrieving lesson: " + e.getMessage());
+            System.err.println("Error retrieving lesson: " + e.getMessage());
         }
 
-        return null;
+        return lesson;
     }
 }

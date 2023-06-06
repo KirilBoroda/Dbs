@@ -1,6 +1,8 @@
 package org.example;
 
 
+import java.util.Objects;
+
 public class Homework {
     private int id;
     private String name;
@@ -34,6 +36,19 @@ public class Homework {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Homework homework = (Homework) o;
+        return id == homework.id && Objects.equals(name, homework.name) && Objects.equals(description, homework.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description);
     }
 
     @Override
