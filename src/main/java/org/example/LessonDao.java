@@ -14,12 +14,7 @@ public class LessonDao {
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setString(nameIndex, lesson.getName());
-
-            if (lesson.getHomework() != null) {
-                statement.setInt(homeworkIdIndex, lesson.getHomework().getId());
-            } else {
-                statement.setNull(homeworkIdIndex, java.sql.Types.INTEGER);
-            }
+            statement.setObject(homeworkIdIndex, (lesson.getHomework() != null) ? lesson.getHomework().getId() : null);
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -82,9 +77,8 @@ public class LessonDao {
 
         try (Connection connection = DataBaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setInt(1, lessonId);
-
+            int lessonIDIndex = 1;
+            statement.setInt(lessonIDIndex, lessonId);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
