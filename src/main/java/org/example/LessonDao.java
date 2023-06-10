@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LessonDao {
-    public void addLesson(Lesson lesson) {
+    public void addLesson(Lesson lesson) throws LessonException {
         String query = "INSERT INTO Lesson (name, homework_id) VALUES (?, ?)";
         int nameIndex = 1;
         int homeworkIdIndex = 2;
@@ -23,12 +23,11 @@ public class LessonDao {
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Error adding lesson: " + e.getMessage());
+            throw new LessonException("Error adding lesson: " + e.getMessage());
         }
     }
 
-
-    public void deleteLesson(int lessonId) {
+    public void deleteLesson(int lessonId) throws LessonException {
         String query = "DELETE FROM Lesson WHERE id = ?";
         int idIndex = 1;
 
@@ -39,12 +38,11 @@ public class LessonDao {
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Error deleting lesson: " + e.getMessage());
+            throw new LessonException("Error deleting lesson: " + e.getMessage());
         }
     }
 
-
-    public List<Lesson> getAllLessons() {
+    public List<Lesson> getAllLessons() throws LessonException {
         List<Lesson> lessons = new ArrayList<>();
         String query = "SELECT Lesson.id, Lesson.name, Homework.id, Homework.name, Homework.description " +
                 "FROM Lesson " +
@@ -55,17 +53,13 @@ public class LessonDao {
              ResultSet resultSet = statement.executeQuery(query)) {
 
             while (resultSet.next()) {
-                int lessonIdIndex = 1;
-                int lessonNameIndex = 2;
-                int homeworkIdIndex = 3;
-                int homeworkNameIndex = 4;
-                int homeworkDescriptionIndex = 5;
+                int index = 1;
 
-                int lessonId = resultSet.getInt(lessonIdIndex);
-                String lessonName = resultSet.getString(lessonNameIndex);
-                int homeworkId = resultSet.getInt(homeworkIdIndex);
-                String homeworkName = resultSet.getString(homeworkNameIndex);
-                String homeworkDescription = resultSet.getString(homeworkDescriptionIndex);
+                int lessonId = resultSet.getInt(index++);
+                String lessonName = resultSet.getString(index++);
+                int homeworkId = resultSet.getInt(index++);
+                String homeworkName = resultSet.getString(index++);
+                String homeworkDescription = resultSet.getString(index++);
 
                 Homework homework = new Homework(homeworkId, homeworkName, homeworkDescription);
                 Lesson lesson = new Lesson(lessonId, lessonName, homework);
@@ -73,14 +67,13 @@ public class LessonDao {
                 lessons.add(lesson);
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving lessons: " + e.getMessage());
+            throw new LessonException("Error retrieving lessons: " + e.getMessage());
         }
 
         return lessons;
     }
 
-
-    public Lesson getLessonById(int lessonId) {
+    public Lesson getLessonById(int lessonId) throws LessonException {
         String query = "SELECT Lesson.id, Lesson.name, Homework.id, Homework.name, Homework.description " +
                 "FROM Lesson " +
                 "JOIN Homework ON Lesson.homework_id = Homework.id " +
@@ -92,28 +85,26 @@ public class LessonDao {
 
             statement.setInt(1, lessonId);
 
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    int lessonIdIndex = 1;
-                    int lessonNameIndex = 2;
-                    int homeworkIdIndex = 3;
-                    int homeworkNameIndex = 4;
-                    int homeworkDescriptionIndex = 5;
+            ResultSet resultSet = statement.executeQuery();
 
-                    int lessonIdResult = resultSet.getInt(lessonIdIndex);
-                    String lessonName = resultSet.getString(lessonNameIndex);
-                    int homeworkId = resultSet.getInt(homeworkIdIndex);
-                    String homeworkName = resultSet.getString(homeworkNameIndex);
-                    String homeworkDescription = resultSet.getString(homeworkDescriptionIndex);
+            if (resultSet.next()) {
+                int index = 1;
 
-                    Homework homework = new Homework(homeworkId, homeworkName, homeworkDescription);
-                    lesson = new Lesson(lessonIdResult, lessonName, homework);
-                }
+                int lessonIdResult = resultSet.getInt(index++);
+                String lessonName = resultSet.getString(index++);
+                int homeworkId = resultSet.getInt(index++);
+                String homeworkName = resultSet.getString(index++);
+                String homeworkDescription = resultSet.getString(index++);
+
+                Homework homework = new Homework(homeworkId, homeworkName, homeworkDescription);
+                lesson = new Lesson(lessonIdResult, lessonName, homework);
             }
+
         } catch (SQLException e) {
-            System.err.println("Error retrieving lesson: " + e.getMessage());
+            throw new LessonException("Error retrieving lesson: " + e.getMessage());
         }
 
         return lesson;
     }
+
 }

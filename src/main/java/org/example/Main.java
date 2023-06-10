@@ -2,36 +2,37 @@ package org.example;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
-    public static void main(String[] args) {
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
+    public static void main(String[] args) throws HomeworkException, LessonException {
         LessonDao lessonDao = new LessonDao();
         Homework homework = new Homework(1, "Homework 1", "Description 1");
         Lesson lesson = new Lesson(12, "Lesson 123", homework);
         HomeworkDao homeworkDao = new HomeworkDao();
         homeworkDao.addHomework(homework);
         lessonDao.addLesson(lesson);
-        System.out.println("Lesson added: " + lesson);
+        LOGGER.info("Lesson added: " + lesson);
 
         List<Lesson> lessons = lessonDao.getAllLessons();
-        System.out.println("All lessons:");
+        LOGGER.info("All lessons:");
         for (Lesson l : lessons) {
-            System.out.println(l);
+            LOGGER.info(l.toString());
         }
 
         int lessonId = 9;
         Lesson lessonById = lessonDao.getLessonById(lessonId);
-        System.out.println("Lesson with ID " + lessonId + ": " + lessonById);
-
+        LOGGER.info("Lesson with ID " + lessonId + ": " + lessonById);
 
         lessonDao.deleteLesson(lessonId);
-        System.out.println("Lesson with ID " + lessonId + " deleted.");
-
+        LOGGER.info("Lesson with ID " + lessonId + " deleted.");
 
         Lesson deletedLesson = lessonDao.getLessonById(lessonId);
         if (deletedLesson == null) {
-            System.out.println("Lesson with ID " + lessonId + " does not exist.");
+            LOGGER.info("Lesson with ID " + lessonId + " does not exist.");
         }
     }
 }

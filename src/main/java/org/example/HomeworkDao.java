@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class HomeworkDao {
-    public void addHomework(Homework homework) {
+    public void addHomework(Homework homework) throws HomeworkException {
         String query = "INSERT INTO Homework (name, description) VALUES (?, ?)";
         int nameIndex = 1;
         int descriptionIndex = 2;
@@ -18,8 +18,9 @@ public class HomeworkDao {
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Error adding homework: " + e.getMessage());
+            throw new HomeworkException("Error adding homework: " + e.getMessage());
         }
     }
+
 
 }
